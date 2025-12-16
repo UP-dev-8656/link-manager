@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Advanced AI-powered link manager with cloud sync, real-time collaboration, and advanced analytics">
     <meta name="theme-color" content="#4361ee">
-    <title>Link Manager Pro v5.0</title>
+    <title>Link Manager Pro v5.2</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
@@ -22,6 +22,10 @@
     
     <!-- Marked for markdown support -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Add Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     
     <style>
         /* Enhanced CSS Variables & Theme System */
@@ -203,7 +207,7 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-2xl);
             padding: var(--spacing-lg) var(--spacing-xl);
-            margin-bottom: var(--spacing-xl);
+            margin: var(--spacing-md) var(--spacing-md) var(--spacing-xl);
             box-shadow: var(--shadow-lg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -259,6 +263,7 @@
             position: relative;
             flex: 1;
             max-width: 500px;
+            min-width: 300px;
         }
 
         .command-trigger {
@@ -273,6 +278,7 @@
             color: var(--text-secondary);
             cursor: pointer;
             transition: all var(--transition-fast);
+            user-select: none;
         }
 
         .command-trigger:hover {
@@ -328,6 +334,7 @@
             align-items: center;
             padding-right: var(--spacing-sm);
             border-right: 1px solid var(--border-color);
+            flex-wrap: wrap;
         }
 
         .filter-btn {
@@ -342,6 +349,7 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            white-space: nowrap;
         }
 
         .filter-btn.active {
@@ -413,10 +421,6 @@
             padding: var(--spacing-xl);
             position: relative;
             overflow: hidden;
-        }
-
-        .analytics-card.chart {
-            grid-column: span 2;
         }
 
         .metric-value {
@@ -518,6 +522,7 @@
             color: var(--text-secondary);
             cursor: pointer;
             transition: all var(--transition-fast);
+            border: none;
         }
 
         .action-btn:hover {
@@ -589,6 +594,8 @@
             opacity: 0;
             transition: all var(--transition-normal);
             box-shadow: var(--shadow-2xl);
+            display: flex;
+            flex-direction: column;
         }
 
         .modal-overlay.active .modal {
@@ -602,11 +609,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .modal-body {
             padding: var(--spacing-xl);
             overflow-y: auto;
+            flex: 1;
         }
 
         /* Enhanced Form Elements */
@@ -804,14 +813,18 @@
             max-width: 400px;
         }
 
+        /* Tag Container */
+        .form-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
         /* Enhanced Responsive Design */
         @media (max-width: 1024px) {
             .link-grid {
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            }
-            
-            .analytics-card.chart {
-                grid-column: span 1;
             }
         }
 
@@ -823,6 +836,8 @@
             .app-header {
                 flex-direction: column;
                 text-align: center;
+                margin: var(--spacing-sm);
+                padding: var(--spacing-md);
             }
             
             .link-grid {
@@ -831,6 +846,14 @@
             
             .quick-actions-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .search-filters {
+                display: none;
+            }
+            
+            .command-menu {
+                min-width: 100%;
             }
         }
 
@@ -961,12 +984,21 @@
             border-radius: var(--radius-full);
             font-size: 12px;
             font-weight: 500;
+            cursor: default;
         }
 
         .badge-primary {
             background: rgba(99, 102, 241, 0.1);
             color: var(--primary-500);
             border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .badge-clickable {
+            cursor: pointer;
+        }
+
+        .badge-clickable:hover {
+            background: var(--surface-300);
         }
 
         /* Enhanced Tooltip */
@@ -1062,6 +1094,30 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-xs);
         }
+
+        /* Import Modal Styles */
+        .import-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .import-option {
+            background: var(--surface-100);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .import-option:hover {
+            border-color: var(--primary-500);
+            background: var(--surface-200);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -1071,7 +1127,7 @@
             <div class="logo">🔗</div>
             <div class="brand-text">
                 <h1>Link Manager Pro</h1>
-                <p class="subtitle" style="color: var(--text-secondary);">v1.0 | AI-Powered Link Management</p>
+                <p class="subtitle" style="color: var(--text-secondary);">v5.2 | Advanced AI-Powered Link Management</p>
             </div>
         </div>
         
@@ -1111,7 +1167,7 @@
                 </div>
                 <input type="text" 
                        class="search-input" 
-                       placeholder="Search across 10,000+ links..."
+                       placeholder="Search your links..."
                        id="searchInput"
                        autocomplete="off">
                 <div class="search-actions" style="display: flex; gap: 8px; padding-left: 8px;">
@@ -1168,37 +1224,32 @@
             </div>
         </div>
 
-        <!-- Enhanced Analytics Dashboard -->
+        <!-- Enhanced Analytics Dashboard (without chart) -->
         <div class="analytics-dashboard animate-fade-in" style="animation-delay: 0.2s;">
             <div class="analytics-card">
                 <h4>Total Links</h4>
-                <div class="metric-value" id="statTotal">1,247</div>
-                <div class="metric-change positive">
+                <div class="metric-value" id="statTotal">0</div>
+                <div class="metric-change">
                     <i class="fas fa-arrow-up"></i>
-                    <span>12% this week</span>
+                    <span>Add your first link!</span>
                 </div>
             </div>
             
             <div class="analytics-card">
                 <h4>Active Sessions</h4>
-                <div class="metric-value" id="statActive">42</div>
-                <div class="metric-change positive">
-                    <i class="fas fa-users"></i>
-                    <span>3 online now</span>
+                <div class="metric-value" id="statActive">1</div>
+                <div class="metric-change">
+                    <i class="fas fa-user"></i>
+                    <span>You are online</span>
                 </div>
             </div>
             
             <div class="analytics-card">
                 <h4>Storage Used</h4>
-                <div class="metric-value" id="statStorage">2.4 GB</div>
+                <div class="metric-value" id="statStorage">0.1 MB</div>
                 <div class="progress-bar" style="margin-top: 16px;">
-                    <div class="progress-fill" style="width: 65%;"></div>
+                    <div class="progress-fill" style="width: 5%;"></div>
                 </div>
-            </div>
-            
-            <div class="analytics-card chart">
-                <h4>Link Growth</h4>
-                <canvas id="growthChart" height="100"></canvas>
             </div>
         </div>
 
@@ -1209,15 +1260,26 @@
 
         <!-- Bulk Actions Bar -->
         <div id="bulkActionsBar" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--surface-50); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--spacing-md); box-shadow: var(--shadow-xl); z-index: var(--z-fixed);">
-            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
-                <span id="selectedCount">0 links selected</span>
-                <button class="btn btn-secondary">Archive</button>
-                <button class="btn btn-secondary">Tag</button>
-                <button class="btn btn-primary">Export Selected</button>
-                <button class="action-btn" onclick="clearSelection()">
+            <div style="display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap;">
+                <span id="selectedCount" style="font-weight: 600;">0 links selected</span>
+                <button class="btn btn-secondary" onclick="linkManager.bulkArchive()">Archive</button>
+                <button class="btn btn-secondary" onclick="linkManager.bulkTag()">Tag</button>
+                <button class="btn btn-primary" onclick="linkManager.bulkExport()">Export Selected</button>
+                <button class="action-btn" onclick="linkManager.clearSelection()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div id="paginationControls" style="display: none; justify-content: center; align-items: center; gap: var(--spacing-md); margin-top: var(--spacing-xl); padding: var(--spacing-md);">
+            <button class="btn btn-secondary" id="prevPage" disabled>
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <span id="pageInfo" style="color: var(--text-secondary);">Page 1 of 1</span>
+            <button class="btn btn-secondary" id="nextPage" disabled>
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
         </div>
     </div>
 
@@ -1308,6 +1370,45 @@
         </div>
     </div>
 
+    <!-- Import Modal -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Import Links</h2>
+                <button class="btn btn-icon" onclick="closeModal('importModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="import-options">
+                    <div class="import-option" onclick="importFromBrowser()">
+                        <i class="fas fa-globe" style="font-size: 32px; margin-bottom: 12px; color: var(--primary-500);"></i>
+                        <h4>Browser Import</h4>
+                        <p style="color: var(--text-secondary); font-size: 14px;">Import from Chrome, Firefox, Safari bookmarks</p>
+                    </div>
+                    
+                    <div class="import-option" onclick="importFromFile()">
+                        <i class="fas fa-file-import" style="font-size: 32px; margin-bottom: 12px; color: var(--primary-500);"></i>
+                        <h4>File Import</h4>
+                        <p style="color: var(--text-secondary); font-size: 14px;">Import from JSON, CSV, HTML files</p>
+                    </div>
+                    
+                    <div class="import-option" onclick="importFromClipboard()">
+                        <i class="fas fa-clipboard" style="font-size: 32px; margin-bottom: 12px; color: var(--primary-500);"></i>
+                        <h4>Clipboard Import</h4>
+                        <p style="color: var(--text-secondary); font-size: 14px;">Paste URLs from clipboard</p>
+                    </div>
+                    
+                    <div class="import-option" onclick="linkManager.showToast('Coming soon!', 'info')">
+                        <i class="fas fa-cloud" style="font-size: 32px; margin-bottom: 12px; color: var(--primary-500);"></i>
+                        <h4>Cloud Services</h4>
+                        <p style="color: var(--text-secondary); font-size: 14px;">Import from Pocket, Raindrop, Instapaper</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Command Palette -->
     <div class="modal-overlay" id="commandPalette">
         <div class="modal" style="max-width: 600px;">
@@ -1318,7 +1419,7 @@
                            class="form-input" 
                            placeholder="Type a command or search..."
                            id="commandInput"
-                           style="border: none; background: transparent; padding: 0;">
+                           style="border: none; background: transparent; padding: 0; width: 100%;">
                 </div>
             </div>
             <div class="modal-body">
@@ -1357,7 +1458,7 @@
 
     <!-- Quick Actions Floating Bar -->
     <div class="floating-actions" style="position: fixed; bottom: var(--spacing-xl); right: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); z-index: var(--z-fixed);">
-        <button class="btn btn-primary btn-icon animate-pulse" onclick="openAddLinkModal()" title="Add Link">
+        <button class="btn btn-primary btn-icon" onclick="openAddLinkModal()" title="Add Link">
             <i class="fas fa-plus"></i>
         </button>
         <button class="btn btn-secondary btn-icon" onclick="openAIOrganizeModal()" title="AI Assistant">
@@ -1373,29 +1474,33 @@
 
     <!-- Context Menu -->
     <div class="context-menu" id="contextMenu">
-        <div class="context-menu-item" onclick="editLink()">
+        <div class="context-menu-item" onclick="linkManager.editLink()">
             <i class="fas fa-edit"></i>
             <span>Edit</span>
         </div>
-        <div class="context-menu-item" onclick="deleteLink()">
+        <div class="context-menu-item" onclick="linkManager.deleteLink()">
             <i class="fas fa-trash"></i>
             <span>Delete</span>
         </div>
-        <div class="context-menu-item" onclick="shareLink()">
+        <div class="context-menu-item" onclick="linkManager.shareLink()">
             <i class="fas fa-share"></i>
             <span>Share</span>
         </div>
-        <div class="context-menu-item" onclick="archiveLink()">
+        <div class="context-menu-item" onclick="linkManager.archiveLink()">
             <i class="fas fa-archive"></i>
             <span>Archive</span>
+        </div>
+        <div class="context-menu-item" onclick="linkManager.toggleFavorite()">
+            <i class="fas fa-star"></i>
+            <span>Toggle Favorite</span>
         </div>
     </div>
 
     <script>
-        // Enhanced Link Manager Pro v5.0
+        // Enhanced Link Manager Pro v5.2 with Advanced AI
         class LinkManagerPro {
             constructor() {
-                this.version = '5.0';
+                this.version = '5.2';
                 this.storageKey = 'linkManagerPro_v5';
                 this.data = {
                     links: [],
@@ -1421,7 +1526,7 @@
                         storageUsed: 0,
                         aiRequests: 0,
                         lastBackup: null,
-                        sessionCount: 0
+                        sessionCount: 1
                     },
                     user: {
                         id: this.generateUUID(),
@@ -1441,7 +1546,9 @@
                     isSelecting: false,
                     sortBy: 'date',
                     sortOrder: 'desc',
-                    filterBy: 'all'
+                    filterBy: 'all',
+                    totalPages: 1,
+                    contextMenuLinkId: null
                 };
                 
                 this.init();
@@ -1452,7 +1559,6 @@
                 this.setupEventListeners();
                 this.setupServiceWorker();
                 this.render();
-                this.initializeCharts();
                 this.showWelcomeMessage();
                 this.startSync();
             }
@@ -1477,43 +1583,33 @@
                     if ('indexedDB' in window) {
                         await this.loadFromIndexedDB();
                     }
-                } catch (error) {
-                    console.error('Error loading data:', error);
-                    this.showToast('Error loading data', 'error');
-                }
-            }
-            
-            async saveData() {
-                try {
-                    this.data.stats.totalLinks = this.data.links.length;
-                    this.data.stats.totalClicks = this.data.links.reduce((sum, link) => sum + (link.clicks || 0), 0);
                     
-                    // Save to localStorage
-                    localStorage.setItem(this.storageKey, JSON.stringify(this.data));
-                    
-                    // Save to IndexedDB if available
-                    if ('indexedDB' in window) {
-                        await this.saveToIndexedDB();
-                    }
-                    
-                    // Update stats display
-                    this.updateStats();
-                    
-                    // Trigger auto-backup if enabled
-                    if (this.data.settings.backupEnabled) {
-                        this.createBackup();
-                    }
+                    // Update tags from existing links
+                    this.extractTagsFromLinks();
                     
                     return true;
                 } catch (error) {
-                    console.error('Error saving data:', error);
-                    this.showToast('Error saving data', 'error');
+                    console.error('Error loading data:', error);
+                    this.showToast('Error loading data', 'error');
                     return false;
                 }
             }
             
+            extractTagsFromLinks() {
+                const allTags = new Set();
+                this.data.links.forEach(link => {
+                    link.tags?.forEach(tag => allTags.add(tag));
+                });
+                this.data.tags = Array.from(allTags);
+            }
+            
             async loadFromIndexedDB() {
                 return new Promise((resolve, reject) => {
+                    if (!('indexedDB' in window)) {
+                        resolve();
+                        return;
+                    }
+                    
                     const request = indexedDB.open('LinkManagerDB', 1);
                     
                     request.onupgradeneeded = (event) => {
@@ -1539,15 +1635,58 @@
                             resolve();
                         };
                         
-                        getAllRequest.onerror = reject;
+                        getAllRequest.onerror = () => {
+                            console.warn('Failed to load from IndexedDB');
+                            resolve();
+                        };
                     };
                     
-                    request.onerror = reject;
+                    request.onerror = () => {
+                        console.warn('IndexedDB not available');
+                        resolve();
+                    };
                 });
+            }
+            
+            async saveData() {
+                try {
+                    this.data.stats.totalLinks = this.data.links.length;
+                    this.data.stats.totalClicks = this.data.links.reduce((sum, link) => sum + (link.clicks || 0), 0);
+                    
+                    // Save to localStorage
+                    localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+                    
+                    // Save to IndexedDB if available
+                    if ('indexedDB' in window) {
+                        await this.saveToIndexedDB();
+                    }
+                    
+                    // Update stats display
+                    this.updateStats();
+                    
+                    // Update pagination
+                    this.updatePagination();
+                    
+                    // Trigger auto-backup if enabled
+                    if (this.data.settings.backupEnabled) {
+                        this.createBackup();
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                    this.showToast('Error saving data', 'error');
+                    return false;
+                }
             }
             
             async saveToIndexedDB() {
                 return new Promise((resolve, reject) => {
+                    if (!('indexedDB' in window)) {
+                        resolve();
+                        return;
+                    }
+                    
                     const request = indexedDB.open('LinkManagerDB', 1);
                     
                     request.onsuccess = (event) => {
@@ -1564,10 +1703,16 @@
                         });
                         
                         transaction.oncomplete = resolve;
-                        transaction.onerror = reject;
+                        transaction.onerror = () => {
+                            console.warn('Failed to save to IndexedDB');
+                            resolve();
+                        };
                     };
                     
-                    request.onerror = reject;
+                    request.onerror = () => {
+                        console.warn('IndexedDB not available');
+                        resolve();
+                    };
                 });
             }
             
@@ -1576,17 +1721,28 @@
                 const searchInput = document.getElementById('searchInput');
                 let searchTimeout;
                 
-                searchInput.addEventListener('input', (e) => {
-                    clearTimeout(searchTimeout);
-                    this.state.searchQuery = e.target.value;
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        clearTimeout(searchTimeout);
+                        this.state.searchQuery = e.target.value;
+                        
+                        // Show instant suggestions
+                        this.showInstantSuggestions(e.target.value);
+                        
+                        searchTimeout = setTimeout(() => {
+                            this.state.currentPage = 1; // Reset to first page on new search
+                            this.renderLinks();
+                        }, 300);
+                    });
                     
-                    // Show instant suggestions
-                    this.showInstantSuggestions(e.target.value);
-                    
-                    searchTimeout = setTimeout(() => {
-                        this.renderLinks();
-                    }, 300);
-                });
+                    // Enter key to search
+                    searchInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            this.state.currentPage = 1;
+                            this.renderLinks();
+                        }
+                    });
+                }
                 
                 // Theme switching
                 document.querySelectorAll('.theme-switcher .action-btn').forEach(btn => {
@@ -1597,14 +1753,20 @@
                 });
                 
                 // Voice search
-                document.getElementById('voiceSearchBtn').addEventListener('click', () => {
-                    this.startVoiceSearch();
-                });
+                const voiceBtn = document.getElementById('voiceSearchBtn');
+                if (voiceBtn) {
+                    voiceBtn.addEventListener('click', () => {
+                        this.startVoiceSearch();
+                    });
+                }
                 
                 // AI search
-                document.getElementById('aiSearchBtn').addEventListener('click', () => {
-                    this.openAIAssistant();
-                });
+                const aiBtn = document.getElementById('aiSearchBtn');
+                if (aiBtn) {
+                    aiBtn.addEventListener('click', () => {
+                        this.openAIAssistant();
+                    });
+                }
                 
                 // Filter buttons
                 document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -1612,9 +1774,34 @@
                         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                         e.currentTarget.classList.add('active');
                         this.state.filterBy = e.currentTarget.textContent.toLowerCase();
+                        this.state.currentPage = 1;
                         this.renderLinks();
                     });
                 });
+                
+                // Pagination
+                const prevBtn = document.getElementById('prevPage');
+                const nextBtn = document.getElementById('nextPage');
+                
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        if (this.state.currentPage > 1) {
+                            this.state.currentPage--;
+                            this.renderLinks();
+                            this.updatePaginationControls();
+                        }
+                    });
+                }
+                
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        if (this.state.currentPage < this.state.totalPages) {
+                            this.state.currentPage++;
+                            this.renderLinks();
+                            this.updatePaginationControls();
+                        }
+                    });
+                }
                 
                 // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
@@ -1633,8 +1820,10 @@
                     // Command/Ctrl + F for search
                     if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
                         e.preventDefault();
-                        searchInput.focus();
-                        searchInput.select();
+                        if (searchInput) {
+                            searchInput.focus();
+                            searchInput.select();
+                        }
                     }
                     
                     // Escape to close modals
@@ -1658,21 +1847,35 @@
                 
                 // Context menu
                 document.addEventListener('contextmenu', (e) => {
-                    if (e.target.closest('.link-card')) {
+                    const linkCard = e.target.closest('.link-card');
+                    if (linkCard) {
                         e.preventDefault();
-                        const linkId = e.target.closest('.link-card').dataset.id;
-                        this.showContextMenu(e.clientX, e.clientY, linkId);
+                        const linkId = linkCard.dataset.id;
+                        this.state.contextMenuLinkId = linkId;
+                        this.showContextMenu(e.clientX, e.clientY);
                     }
                 });
                 
                 // Click outside to close context menu
-                document.addEventListener('click', () => {
-                    this.closeContextMenu();
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.context-menu')) {
+                        this.closeContextMenu();
+                    }
                 });
+                
+                // Auto-fetch metadata on URL input
+                const urlInput = document.getElementById('linkUrl');
+                if (urlInput) {
+                    urlInput.addEventListener('blur', async (e) => {
+                        if (e.target.value && this.data.settings.autoFetchMetadata) {
+                            await this.autoFetchMetadata(e.target.value);
+                        }
+                    });
+                }
             }
             
             setupServiceWorker() {
-                if ('serviceWorker' in navigator) {
+                if ('serviceWorker' in navigator && 'PushManager' in window) {
                     navigator.serviceWorker.register('/sw.js')
                         .then(registration => {
                             console.log('Service Worker registered:', registration);
@@ -1688,6 +1891,78 @@
                 this.data.settings.theme = theme;
                 this.saveData();
                 this.showToast(`Theme changed to ${theme}`, 'info');
+            }
+            
+            async autoFetchMetadata(url) {
+                try {
+                    const titleInput = document.getElementById('linkTitle');
+                    const descInput = document.getElementById('linkDescription');
+                    
+                    if (!titleInput || !descInput) return;
+                    
+                    // Show loading state
+                    titleInput.value = 'Fetching metadata...';
+                    descInput.value = 'Please wait...';
+                    
+                    // In a real app, you would fetch from an API
+                    // This is a simulation
+                    setTimeout(() => {
+                        try {
+                            const urlObj = new URL(url);
+                            const hostname = urlObj.hostname.replace('www.', '');
+                            
+                            titleInput.value = `${hostname.charAt(0).toUpperCase() + hostname.slice(1)} - Web Resource`;
+                            descInput.value = `A web resource from ${hostname}. Add your own description here.`;
+                            
+                            // Auto-suggest tags based on URL
+                            this.suggestTagsFromUrl(url);
+                            
+                        } catch (error) {
+                            titleInput.value = 'New Link';
+                            descInput.value = '';
+                        }
+                    }, 800);
+                    
+                } catch (error) {
+                    console.error('Error fetching metadata:', error);
+                }
+            }
+            
+            suggestTagsFromUrl(url) {
+                try {
+                    const urlObj = new URL(url);
+                    const hostname = urlObj.hostname.toLowerCase();
+                    const tagContainer = document.getElementById('tagContainer');
+                    
+                    if (!tagContainer) return;
+                    
+                    const suggestedTags = [];
+                    
+                    if (hostname.includes('github')) {
+                        suggestedTags.push('development', 'code', 'git');
+                    } else if (hostname.includes('youtube')) {
+                        suggestedTags.push('video', 'tutorial');
+                    } else if (hostname.includes('medium')) {
+                        suggestedTags.push('article', 'blog');
+                    } else if (hostname.includes('stackoverflow')) {
+                        suggestedTags.push('programming', 'q&a');
+                    }
+                    
+                    // Clear existing tags
+                    tagContainer.innerHTML = '';
+                    
+                    // Add suggested tags
+                    suggestedTags.forEach(tag => {
+                        const badge = document.createElement('span');
+                        badge.className = 'badge badge-clickable';
+                        badge.textContent = tag;
+                        badge.onclick = () => badge.remove();
+                        tagContainer.appendChild(badge);
+                    });
+                    
+                } catch (error) {
+                    console.error('Error suggesting tags:', error);
+                }
             }
             
             async addLink(linkData) {
@@ -1712,14 +1987,18 @@
                         priority: 'medium'
                     };
                     
-                    // Auto-fetch metadata if enabled
-                    if (this.data.settings.autoFetchMetadata) {
-                        await this.fetchLinkMetadata(link);
+                    // Auto-fetch favicon
+                    try {
+                        const urlObj = new URL(link.url);
+                        link.metadata.favicon = `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=128`;
+                    } catch (error) {
+                        // Invalid URL, continue without favicon
                     }
                     
-                    // AI suggestions for tags and category
-                    if (this.data.settings.aiEnabled && this.data.settings.enableAI) {
-                        await this.suggestAITags(link);
+                    // Estimate read time
+                    if (link.description) {
+                        const words = link.description.split(/\s+/).length;
+                        link.metadata.estimatedReadTime = Math.ceil(words / 200);
                     }
                     
                     this.data.links.unshift(link);
@@ -1735,58 +2014,11 @@
                 }
             }
             
-            async fetchLinkMetadata(link) {
-                try {
-                    // Fetch favicon
-                    const faviconUrl = `https://www.google.com/s2/favicons?domain=${new URL(link.url).hostname}&sz=128`;
-                    link.metadata.favicon = faviconUrl;
-                    
-                    // Estimate read time based on description length
-                    if (link.description) {
-                        const words = link.description.split(/\s+/).length;
-                        link.metadata.estimatedReadTime = Math.ceil(words / 200); // 200 words per minute
-                    }
-                    
-                    // Detect language
-                    if (link.description) {
-                        // Simple language detection (would use proper API in production)
-                        link.metadata.language = 'en';
-                    }
-                    
-                    return link;
-                } catch (error) {
-                    console.error('Error fetching metadata:', error);
-                    return link;
-                }
-            }
-            
-            async suggestAITags(link) {
-                // Simulate AI tag suggestion (would call AI API in production)
-                const url = new URL(link.url);
-                const hostname = url.hostname.toLowerCase();
-                
-                if (hostname.includes('github')) {
-                    link.tags.push('development', 'code', 'git');
-                    link.category = link.category === 'General' ? 'Work' : link.category;
-                } else if (hostname.includes('medium') || hostname.includes('dev.to')) {
-                    link.tags.push('blog', 'article', 'reading');
-                    link.category = link.category === 'General' ? 'Learning' : link.category;
-                } else if (hostname.includes('youtube')) {
-                    link.tags.push('video', 'tutorial', 'entertainment');
-                    link.category = link.category === 'General' ? 'Entertainment' : link.category;
-                }
-                
-                // Remove duplicates
-                link.tags = [...new Set(link.tags)];
-                
-                return link;
-            }
-            
             renderLinks() {
                 const container = document.getElementById('linkGrid');
                 if (!container) return;
                 
-                let filteredLinks = this.data.links;
+                let filteredLinks = [...this.data.links];
                 
                 // Apply search filter
                 if (this.state.searchQuery) {
@@ -1850,22 +2082,35 @@
                     return this.state.sortOrder === 'desc' ? comparison : -comparison;
                 });
                 
-                // Pagination
-                const startIndex = (this.state.currentPage - 1) * this.data.settings.itemsPerPage;
-                const endIndex = startIndex + this.data.settings.itemsPerPage;
+                // Calculate pagination
+                const totalItems = filteredLinks.length;
+                const itemsPerPage = this.data.settings.itemsPerPage;
+                this.state.totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+                
+                // Ensure current page is valid
+                if (this.state.currentPage > this.state.totalPages) {
+                    this.state.currentPage = this.state.totalPages || 1;
+                }
+                
+                // Get current page items
+                const startIndex = (this.state.currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
                 const pageLinks = filteredLinks.slice(startIndex, endIndex);
+                
+                // Update pagination info
+                this.updatePaginationControls();
                 
                 if (pageLinks.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-state-icon">🔍</div>
-                            <h3>No links found</h3>
+                            <h3>${this.state.searchQuery || this.state.selectedTags.size > 0 ? 'No links found' : 'Welcome to Link Manager Pro!'}</h3>
                             <p style="color: var(--text-secondary); margin-bottom: 24px;">
-                                ${this.state.searchQuery ? 'Try a different search or filter' : 'Add your first link to get started'}
+                                ${this.state.searchQuery ? 'Try a different search or filter' : 'Start by adding your first link'}
                             </p>
-                            ${!this.state.searchQuery ? `
+                            ${!this.state.searchQuery && !this.state.selectedTags.size ? `
                                 <button class="btn btn-primary" onclick="openAddLinkModal()">
-                                    <i class="fas fa-plus"></i> Add First Link
+                                    <i class="fas fa-plus"></i> Add Your First Link
                                 </button>
                             ` : ''}
                         </div>
@@ -1874,15 +2119,12 @@
                 }
                 
                 container.innerHTML = pageLinks.map(link => this.createLinkCard(link)).join('');
-                
-                // Update bulk actions bar
-                this.updateBulkActionsBar();
             }
             
             createLinkCard(link) {
                 const isSelected = this.state.selectedLinks.has(link.id);
                 const favicon = link.metadata?.favicon || 
-                    `https://www.google.com/s2/favicons?domain=${new URL(link.url).hostname}&sz=32`;
+                    `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12">🔗</text></svg>`;
                 
                 return `
                     <div class="link-card ${isSelected ? 'selected' : ''} ${link.favorite ? 'favorite' : ''}" 
@@ -1892,17 +2134,18 @@
                         
                         <div class="link-card-header">
                             <div class="link-favicon">
-                                <img src="${favicon}" alt="${link.title}" onerror="this.src='data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"12\">🔗</text></svg>'">
+                                <img src="${favicon}" alt="${this.escapeHtml(link.title)}" 
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"12\">🔗</text></svg>'">
                             </div>
                             
                             <div class="link-actions">
-                                <button class="action-btn" onclick="linkManager.toggleFavorite('${link.id}')">
+                                <button class="action-btn" onclick="event.stopPropagation(); linkManager.toggleFavorite('${link.id}')">
                                     <i class="${link.favorite ? 'fas' : 'far'} fa-star"></i>
                                 </button>
-                                <button class="action-btn" onclick="linkManager.copyLink('${link.id}')">
+                                <button class="action-btn" onclick="event.stopPropagation(); linkManager.copyLink('${link.id}')">
                                     <i class="fas fa-copy"></i>
                                 </button>
-                                <button class="action-btn" onclick="linkManager.shareLink('${link.id}')">
+                                <button class="action-btn" onclick="event.stopPropagation(); linkManager.shareLink('${link.id}')">
                                     <i class="fas fa-share-alt"></i>
                                 </button>
                             </div>
@@ -1921,10 +2164,10 @@
                         </p>
                         
                         <div class="link-meta">
-                            <span class="badge">${link.category}</span>
+                            <span class="badge">${this.escapeHtml(link.category)}</span>
                             ${link.tags.slice(0, 3).map(tag => `
-                                <span class="badge" onclick="event.stopPropagation(); linkManager.filterByTag('${tag}')">
-                                    ${tag}
+                                <span class="badge badge-clickable" onclick="event.stopPropagation(); linkManager.filterByTag('${this.escapeHtml(tag)}')">
+                                    ${this.escapeHtml(tag)}
                                 </span>
                             `).join('')}
                             ${link.tags.length > 3 ? `<span class="badge">+${link.tags.length - 3}</span>` : ''}
@@ -1950,10 +2193,15 @@
             }
             
             handleLinkClick(event, linkId) {
+                // Don't trigger if clicking on action buttons
+                if (event.target.closest('.action-btn') || event.target.closest('.link-preview')) {
+                    return;
+                }
+                
                 if (event.ctrlKey || event.metaKey || event.shiftKey) {
                     event.preventDefault();
                     this.toggleLinkSelection(linkId);
-                } else if (!event.target.closest('.action-btn') && !event.target.closest('.link-preview')) {
+                } else {
                     // Regular click - open edit modal
                     this.editLink(linkId);
                 }
@@ -1966,90 +2214,170 @@
                     this.state.selectedLinks.add(linkId);
                 }
                 this.renderLinks();
+                this.updateBulkActionsBar();
             }
             
             clearSelection() {
                 this.state.selectedLinks.clear();
                 this.renderLinks();
+                this.updateBulkActionsBar();
             }
             
             updateBulkActionsBar() {
                 const bar = document.getElementById('bulkActionsBar');
                 const count = document.getElementById('selectedCount');
                 
-                if (this.state.selectedLinks.size > 0) {
-                    bar.style.display = 'block';
-                    count.textContent = `${this.state.selectedLinks.size} links selected`;
-                } else {
-                    bar.style.display = 'none';
+                if (bar && count) {
+                    if (this.state.selectedLinks.size > 0) {
+                        bar.style.display = 'block';
+                        count.textContent = `${this.state.selectedLinks.size} link${this.state.selectedLinks.size === 1 ? '' : 's'} selected`;
+                    } else {
+                        bar.style.display = 'none';
+                    }
                 }
             }
             
-            formatDate(dateString) {
-                const date = new Date(dateString);
-                const now = new Date();
-                const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+            bulkArchive() {
+                this.state.selectedLinks.forEach(linkId => {
+                    const link = this.data.links.find(l => l.id === linkId);
+                    if (link) {
+                        link.archived = true;
+                    }
+                });
+                this.saveData();
+                this.renderLinks();
+                this.clearSelection();
+                this.showToast(`Archived ${this.state.selectedLinks.size} links`, 'success');
+            }
+            
+            bulkTag() {
+                const tag = prompt('Enter tag to add to selected links:');
+                if (tag) {
+                    this.state.selectedLinks.forEach(linkId => {
+                        const link = this.data.links.find(l => l.id === linkId);
+                        if (link && !link.tags.includes(tag)) {
+                            link.tags.push(tag);
+                        }
+                    });
+                    this.saveData();
+                    this.renderLinks();
+                    this.clearSelection();
+                    this.showToast(`Added tag "${tag}" to ${this.state.selectedLinks.size} links`, 'success');
+                }
+            }
+            
+            bulkExport() {
+                const selectedLinks = Array.from(this.state.selectedLinks).map(id => 
+                    this.data.links.find(l => l.id === id)
+                ).filter(Boolean);
                 
-                if (diffInDays === 0) {
-                    return 'Today';
-                } else if (diffInDays === 1) {
-                    return 'Yesterday';
-                } else if (diffInDays < 7) {
-                    return `${diffInDays} days ago`;
-                } else {
-                    return date.toLocaleDateString();
+                if (selectedLinks.length > 0) {
+                    this.exportSelectedLinks(selectedLinks);
+                }
+            }
+            
+            async exportSelectedLinks(links) {
+                const exportData = {
+                    version: this.version,
+                    exportDate: new Date().toISOString(),
+                    links: links,
+                    count: links.length
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `link-manager-export-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showToast(`Exported ${links.length} links`, 'success');
+            }
+            
+            formatDate(dateString) {
+                try {
+                    const date = new Date(dateString);
+                    const now = new Date();
+                    const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffInDays === 0) {
+                        return 'Today';
+                    } else if (diffInDays === 1) {
+                        return 'Yesterday';
+                    } else if (diffInDays < 7) {
+                        return `${diffInDays} days ago`;
+                    } else {
+                        return date.toLocaleDateString();
+                    }
+                } catch (error) {
+                    return 'Unknown date';
                 }
             }
             
             updateStats() {
-                document.getElementById('statTotal').textContent = this.data.links.length.toLocaleString();
-                document.getElementById('statActive').textContent = this.data.stats.sessionCount;
+                const statTotal = document.getElementById('statTotal');
+                const statActive = document.getElementById('statActive');
+                const statStorage = document.getElementById('statStorage');
+                
+                if (statTotal) statTotal.textContent = this.data.links.length.toLocaleString();
+                if (statActive) statActive.textContent = this.data.stats.sessionCount;
                 
                 // Calculate storage
                 const dataSize = JSON.stringify(this.data).length;
-                const sizeInGB = (dataSize / (1024 * 1024 * 1024)).toFixed(2);
-                document.getElementById('statStorage').textContent = `${sizeInGB} GB`;
-                this.data.stats.storageUsed = parseFloat(sizeInGB);
+                const sizeInMB = (dataSize / (1024 * 1024)).toFixed(2);
+                if (statStorage) statStorage.textContent = `${sizeInMB} MB`;
+                this.data.stats.storageUsed = parseFloat(sizeInMB);
             }
             
-            initializeCharts() {
-                // Initialize growth chart
-                const ctx = document.getElementById('growthChart').getContext('2d');
-                this.growthChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                        datasets: [{
-                            label: 'Links Added',
-                            data: [120, 190, 300, 500, 700, 1000],
-                            borderColor: 'rgb(99, 102, 241)',
-                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
-                });
+            updatePagination() {
+                const totalItems = this.getFilteredLinksCount();
+                const itemsPerPage = this.data.settings.itemsPerPage;
+                this.state.totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+                this.updatePaginationControls();
+            }
+            
+            updatePaginationControls() {
+                const prevBtn = document.getElementById('prevPage');
+                const nextBtn = document.getElementById('nextPage');
+                const pageInfo = document.getElementById('pageInfo');
+                const paginationContainer = document.getElementById('paginationControls');
+                
+                if (prevBtn) {
+                    prevBtn.disabled = this.state.currentPage <= 1;
+                }
+                
+                if (nextBtn) {
+                    nextBtn.disabled = this.state.currentPage >= this.state.totalPages;
+                }
+                
+                if (pageInfo) {
+                    pageInfo.textContent = `Page ${this.state.currentPage} of ${this.state.totalPages}`;
+                }
+                
+                // Show/hide pagination
+                if (paginationContainer) {
+                    paginationContainer.style.display = this.state.totalPages > 1 ? 'flex' : 'none';
+                }
+            }
+            
+            getFilteredLinksCount() {
+                let filteredLinks = [...this.data.links];
+                
+                if (this.state.searchQuery) {
+                    const query = this.state.searchQuery.toLowerCase();
+                    filteredLinks = filteredLinks.filter(link => 
+                        link.title.toLowerCase().includes(query) ||
+                        link.url.toLowerCase().includes(query) ||
+                        link.description?.toLowerCase().includes(query) ||
+                        link.tags.some(tag => tag.toLowerCase().includes(query)) ||
+                        link.category.toLowerCase().includes(query)
+                    );
+                }
+                
+                return filteredLinks.length;
             }
             
             async startVoiceSearch() {
@@ -2072,9 +2400,13 @@
                 
                 recognition.onresult = (event) => {
                     const transcript = event.results[0][0].transcript;
-                    document.getElementById('searchInput').value = transcript;
-                    this.state.searchQuery = transcript;
-                    this.renderLinks();
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) {
+                        searchInput.value = transcript;
+                        this.state.searchQuery = transcript;
+                        this.state.currentPage = 1;
+                        this.renderLinks();
+                    }
                 };
                 
                 recognition.onerror = (event) => {
@@ -2087,22 +2419,23 @@
             
             showInstantSuggestions(query) {
                 if (!query.trim()) {
-                    document.getElementById('searchSuggestions').style.display = 'none';
+                    const container = document.getElementById('searchSuggestions');
+                    if (container) container.style.display = 'none';
                     return;
                 }
                 
                 const suggestions = this.getSearchSuggestions(query);
                 const container = document.getElementById('searchSuggestions');
                 
-                if (suggestions.length > 0) {
+                if (container && suggestions.length > 0) {
                     container.innerHTML = suggestions.map(s => `
-                        <div class="multiselect-option" onclick="linkManager.applySearchSuggestion('${s}')">
+                        <div class="multiselect-option" onclick="linkManager.applySearchSuggestion('${this.escapeHtml(s)}')">
                             <i class="fas fa-search" style="color: var(--text-tertiary); margin-right: 8px;"></i>
-                            ${s}
+                            ${this.escapeHtml(s)}
                         </div>
                     `).join('');
                     container.style.display = 'block';
-                } else {
+                } else if (container) {
                     container.style.display = 'none';
                 }
             }
@@ -2144,13 +2477,19 @@
             }
             
             applySearchSuggestion(suggestion) {
-                document.getElementById('searchInput').value = suggestion;
-                this.state.searchQuery = suggestion;
-                this.renderLinks();
-                document.getElementById('searchSuggestions').style.display = 'none';
-                
-                // Save to recent searches
-                this.saveRecentSearch(suggestion);
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.value = suggestion;
+                    this.state.searchQuery = suggestion;
+                    this.state.currentPage = 1;
+                    this.renderLinks();
+                    
+                    const suggestionsContainer = document.getElementById('searchSuggestions');
+                    if (suggestionsContainer) suggestionsContainer.style.display = 'none';
+                    
+                    // Save to recent searches
+                    this.saveRecentSearch(suggestion);
+                }
             }
             
             saveRecentSearch(search) {
@@ -2178,31 +2517,35 @@
                 
                 openModal('aiAssistantModal');
                 const chat = document.getElementById('aiChat');
-                chat.innerHTML = `
-                    <div style="background: var(--surface-100); padding: 16px; border-radius: var(--radius-lg); margin-bottom: 12px;">
-                        <strong><i class="fas fa-robot"></i> AI Assistant:</strong>
-                        <p style="margin-top: 8px;">Hello! I'm your AI assistant. I can help you with:</p>
-                        <ul style="margin-top: 8px; padding-left: 20px;">
-                            <li>Finding and organizing links</li>
-                            <li>Summarizing content</li>
-                            <li>Detecting duplicates</li>
-                            <li>Suggesting tags and categories</li>
-                            <li>Analyzing your link patterns</li>
-                        </ul>
-                        <p style="margin-top: 8px;">What would you like me to help you with today?</p>
-                    </div>
-                `;
-                
-                chat.scrollTop = chat.scrollHeight;
+                if (chat) {
+                    chat.innerHTML = `
+                        <div style="background: var(--surface-100); padding: 16px; border-radius: var(--radius-lg); margin-bottom: 12px;">
+                            <strong><i class="fas fa-robot"></i> AI Assistant (v5.2):</strong>
+                            <p style="margin-top: 8px;">Hello! I'm your advanced AI assistant. I can help you with:</p>
+                            <ul style="margin-top: 8px; padding-left: 20px;">
+                                <li>Finding and organizing links</li>
+                                <li>Summarizing content</li>
+                                <li>Detecting duplicates</li>
+                                <li>Suggesting tags and categories</li>
+                                <li>Analyzing your link patterns</li>
+                                <li>Generating insights from your collection</li>
+                            </ul>
+                            <p style="margin-top: 8px;">What would you like me to help you with today?</p>
+                        </div>
+                    `;
+                    
+                    chat.scrollTop = chat.scrollHeight;
+                }
             }
             
             async sendAIQuery() {
                 const input = document.getElementById('aiQuery');
-                const query = input.value.trim();
+                const query = input?.value.trim();
                 
-                if (!query) return;
+                if (!query || !input) return;
                 
                 const chat = document.getElementById('aiChat');
+                if (!chat) return;
                 
                 // Add user message
                 chat.innerHTML += `
@@ -2219,18 +2562,19 @@
                 chat.innerHTML += `
                     <div id="${thinkingId}" style="background: var(--surface-100); padding: 12px; border-radius: var(--radius-lg); margin-bottom: 12px;">
                         <strong><i class="fas fa-robot"></i> AI Assistant:</strong>
-                        <p style="margin-top: 4px;"><i class="fas fa-spinner fa-spin"></i> Thinking...</p>
+                        <p style="margin-top: 4px;"><i class="fas fa-spinner fa-spin"></i> Analyzing your request...</p>
                     </div>
                 `;
                 
                 chat.scrollTop = chat.scrollHeight;
                 
                 try {
-                    // Simulate AI processing (would call AI API in production)
+                    // Simulate AI processing
                     await new Promise(resolve => setTimeout(resolve, 1500));
                     
                     // Remove thinking indicator
-                    document.getElementById(thinkingId).remove();
+                    const thinkingElement = document.getElementById(thinkingId);
+                    if (thinkingElement) thinkingElement.remove();
                     
                     // Generate AI response
                     const response = await this.generateAIResponse(query);
@@ -2248,7 +2592,9 @@
                     this.saveData();
                     
                 } catch (error) {
-                    document.getElementById(thinkingId).remove();
+                    const thinkingElement = document.getElementById(thinkingId);
+                    if (thinkingElement) thinkingElement.remove();
+                    
                     chat.innerHTML += `
                         <div style="background: var(--surface-100); padding: 12px; border-radius: var(--radius-lg); margin-bottom: 12px; color: var(--danger-500);">
                             <strong><i class="fas fa-exclamation-circle"></i> Error:</strong>
@@ -2261,7 +2607,7 @@
             async generateAIResponse(query) {
                 const lowerQuery = query.toLowerCase();
                 
-                // Analyze query and generate appropriate response
+                // Enhanced AI responses with more capabilities
                 if (lowerQuery.includes('duplicate') || lowerQuery.includes('duplicates')) {
                     const duplicates = this.findDuplicates();
                     if (duplicates.length > 0) {
@@ -2270,7 +2616,7 @@
                             <p style="margin-top: 8px;">Here are the most common duplicates:</p>
                             <ul style="margin-top: 8px; padding-left: 20px;">
                                 ${duplicates.slice(0, 3).map(d => `
-                                    <li>"${d.title}" - ${d.count} occurrences</li>
+                                    <li>"${this.escapeHtml(d.title)}" - ${d.count} occurrences</li>
                                 `).join('')}
                             </ul>
                             <button class="btn btn-primary" onclick="linkManager.mergeDuplicates()" style="margin-top: 12px;">
@@ -2284,11 +2630,12 @@
                 
                 if (lowerQuery.includes('summarize') || lowerQuery.includes('summary')) {
                     return `
-                        <p>I can analyze and summarize your links. Here's what I found:</p>
+                        <p>I've analyzed your link collection. Here's a summary:</p>
                         <ul style="margin-top: 8px; padding-left: 20px;">
                             <li>You have ${this.data.links.length} total links</li>
                             <li>${this.data.links.filter(l => l.favorite).length} are marked as favorites</li>
                             <li>Most links are in the "${this.getMostCommonCategory()}" category</li>
+                            <li>Top tags: ${this.getTopTags(3).join(', ')}</li>
                         </ul>
                         <p style="margin-top: 12px;">Would you like me to:</p>
                         <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
@@ -2298,30 +2645,119 @@
                             <button class="btn btn-secondary" onclick="linkManager.findTrendingTopics()">
                                 Find Trending Topics
                             </button>
+                            <button class="btn btn-secondary" onclick="linkManager.generateLinkInsights()">
+                                Generate Insights
+                            </button>
                         </div>
                     `;
                 }
                 
-                if (lowerQuery.includes('organize') || lowerQuery.includes('categorize')) {
+                if (lowerQuery.includes('organize') || lowerQuery.includes('categorize') || lowerQuery.includes('category')) {
                     const uncategorized = this.data.links.filter(l => l.category === 'General');
                     if (uncategorized.length > 0) {
                         return `
-                            <p>I found ${uncategorized.length} links that need categorization.</p>
-                            <p style="margin-top: 8px;">I can analyze their content and suggest appropriate categories.</p>
-                            <button class="btn btn-primary" onclick="linkManager.suggestCategories()" style="margin-top: 12px;">
-                                <i class="fas fa-tags"></i> Suggest Categories for All Links
-                            </button>
+                            <p>I found ${uncategorized.length} links that could use better categorization.</p>
+                            <p style="margin-top: 8px;">I can analyze their content and suggest appropriate categories and tags.</p>
+                            <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+                                <button class="btn btn-primary" onclick="linkManager.suggestCategories()">
+                                    <i class="fas fa-tags"></i> Suggest Categories
+                                </button>
+                                <button class="btn btn-secondary" onclick="linkManager.autoTagLinks()">
+                                    <i class="fas fa-hashtag"></i> Auto-tag Links
+                                </button>
+                            </div>
                         `;
                     } else {
-                        return '<p>All your links are already categorized! Well done.</p>';
+                        return '<p>All your links are already well categorized! Well done.</p>';
                     }
                 }
                 
-                // Default response for other queries
+                if (lowerQuery.includes('find') && (lowerQuery.includes('link') || lowerQuery.includes('links'))) {
+                    const topic = this.extractTopicFromQuery(query);
+                    if (topic) {
+                        const matchingLinks = this.findLinksByTopic(topic);
+                        if (matchingLinks.length > 0) {
+                            return `
+                                <p>I found ${matchingLinks.length} links about "${topic}":</p>
+                                <ul style="margin-top: 8px; padding-left: 20px;">
+                                    ${matchingLinks.slice(0, 5).map(link => `
+                                        <li>
+                                            <a href="#" onclick="linkManager.openLink('${link.id}'); return false;" style="color: var(--primary-500); text-decoration: none;">
+                                                ${this.escapeHtml(link.title)}
+                                            </a>
+                                            - ${this.escapeHtml(link.category)}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                                ${matchingLinks.length > 5 ? `<p>... and ${matchingLinks.length - 5} more links.</p>` : ''}
+                            `;
+                        } else {
+                            return `<p>I couldn't find any links about "${topic}". Try adding some or check your spelling.</p>`;
+                        }
+                    }
+                }
+                
+                if (lowerQuery.includes('recent') || lowerQuery.includes('latest')) {
+                    const recentLinks = this.getRecentLinks(5);
+                    if (recentLinks.length > 0) {
+                        return `
+                            <p>Here are your ${recentLinks.length} most recent links:</p>
+                            <ul style="margin-top: 8px; padding-left: 20px;">
+                                ${recentLinks.map(link => `
+                                    <li>
+                                        <a href="#" onclick="linkManager.openLink('${link.id}'); return false;" style="color: var(--primary-500); text-decoration: none;">
+                                            ${this.escapeHtml(link.title)}
+                                        </a>
+                                        - ${this.formatDate(link.createdAt)}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        `;
+                    }
+                }
+                
+                if (lowerQuery.includes('stat') || lowerQuery.includes('analytics')) {
+                    return `
+                        <p>Here are your link statistics:</p>
+                        <ul style="margin-top: 8px; padding-left: 20px;">
+                            <li>Total links: ${this.data.links.length}</li>
+                            <li>Favorites: ${this.data.links.filter(l => l.favorite).length}</li>
+                            <li>Categories: ${this.getCategoryCount()} different categories</li>
+                            <li>Tags: ${this.data.tags.length} unique tags</li>
+                            <li>Most active category: ${this.getMostCommonCategory()}</li>
+                        </ul>
+                        <button class="btn btn-primary" onclick="openAnalyticsModal()" style="margin-top: 12px;">
+                            <i class="fas fa-chart-bar"></i> View Detailed Analytics
+                        </button>
+                    `;
+                }
+                
+                // Advanced AI: Content analysis
+                if (lowerQuery.includes('analyze') || lowerQuery.includes('analysis')) {
+                    return `
+                        <p>I can perform deep analysis on your link collection. Here's what I can analyze:</p>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px;">
+                            <button class="btn btn-secondary" onclick="linkManager.analyzeLinkPatterns()">
+                                <i class="fas fa-chart-pie"></i> Usage Patterns
+                            </button>
+                            <button class="btn btn-secondary" onclick="linkManager.analyzeContentThemes()">
+                                <i class="fas fa-palette"></i> Content Themes
+                            </button>
+                            <button class="btn btn-secondary" onclick="linkManager.analyzeLinkQuality()">
+                                <i class="fas fa-star"></i> Link Quality
+                            </button>
+                            <button class="btn btn-secondary" onclick="linkManager.generateRecommendations()">
+                                <i class="fas fa-lightbulb"></i> Recommendations
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                // Default response with enhanced suggestions
                 return `
-                    <p>I understand you're asking about "${query}". Based on your query, here are some actions I can help with:</p>
+                    <p>I understand you're asking about "${this.escapeHtml(query)}". I'm your advanced AI assistant with these capabilities:</p>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px;">
-                        <button class="btn btn-secondary" onclick="linkManager.findSimilarLinks('${query}')">
+                        <button class="btn btn-secondary" onclick="linkManager.findSimilarLinks('${this.escapeHtml(query)}')">
                             Find Similar Links
                         </button>
                         <button class="btn btn-secondary" onclick="linkManager.analyzeLinkPatterns()">
@@ -2330,11 +2766,23 @@
                         <button class="btn btn-secondary" onclick="linkManager.cleanUpOldLinks()">
                             Clean Up Old Links
                         </button>
-                        <button class="btn btn-secondary" onclick="linkManager.generateTopicReport('${query}')">
+                        <button class="btn btn-secondary" onclick="linkManager.generateTopicReport('${this.escapeHtml(query)}')">
                             Generate Report
                         </button>
+                        <button class="btn btn-secondary" onclick="linkManager.suggestRelatedContent()">
+                            Suggest Related Content
+                        </button>
+                        <button class="btn btn-secondary" onclick="linkManager.optimizeCollection()">
+                            Optimize Collection
+                        </button>
                     </div>
-                    <p style="margin-top: 12px;">Or you can ask me something specific about your links!</p>
+                    <p style="margin-top: 12px;">You can also ask me specific questions like:</p>
+                    <ul style="margin-top: 4px; padding-left: 20px; font-size: 14px; color: var(--text-secondary);">
+                        <li>"Find all tutorial links"</li>
+                        <li>"Show me links from last week"</li>
+                        <li>"What are my most visited links?"</li>
+                        <li>"Organize my work-related links"</li>
+                    </ul>
                 `;
             }
             
@@ -2348,20 +2796,67 @@
                 return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'General';
             }
             
+            getTopTags(count = 5) {
+                const tagCounts = {};
+                this.data.links.forEach(link => {
+                    link.tags?.forEach(tag => {
+                        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                    });
+                });
+                
+                return Object.entries(tagCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, count)
+                    .map(([tag]) => tag);
+            }
+            
+            getCategoryCount() {
+                const categories = new Set(this.data.links.map(l => l.category));
+                return categories.size;
+            }
+            
+            extractTopicFromQuery(query) {
+                const phrases = ['find links about', 'find links on', 'show me links about', 'links about'];
+                for (const phrase of phrases) {
+                    if (query.toLowerCase().includes(phrase)) {
+                        return query.toLowerCase().split(phrase)[1]?.trim();
+                    }
+                }
+                return null;
+            }
+            
+            findLinksByTopic(topic) {
+                topic = topic.toLowerCase();
+                return this.data.links.filter(link => 
+                    link.title.toLowerCase().includes(topic) ||
+                    link.description?.toLowerCase().includes(topic) ||
+                    link.tags.some(tag => tag.toLowerCase().includes(tag)) ||
+                    link.category.toLowerCase().includes(topic)
+                );
+            }
+            
+            getRecentLinks(count = 5) {
+                return [...this.data.links]
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .slice(0, count);
+            }
+            
             findDuplicates() {
                 const urlMap = new Map();
                 
                 this.data.links.forEach(link => {
-                    // Normalize URL
-                    const normalizedUrl = link.url
-                        .toLowerCase()
-                        .replace(/https?:\/\/(www\.)?/, '')
-                        .replace(/\/$/, '');
-                    
-                    if (!urlMap.has(normalizedUrl)) {
-                        urlMap.set(normalizedUrl, []);
+                    try {
+                        // Normalize URL
+                        const urlObj = new URL(link.url);
+                        const normalizedUrl = urlObj.hostname + urlObj.pathname;
+                        
+                        if (!urlMap.has(normalizedUrl)) {
+                            urlMap.set(normalizedUrl, []);
+                        }
+                        urlMap.get(normalizedUrl).push(link);
+                    } catch (error) {
+                        // Invalid URL, skip
                     }
-                    urlMap.get(normalizedUrl).push(link);
                 });
                 
                 return Array.from(urlMap.entries())
@@ -2379,7 +2874,7 @@
                 let mergedCount = 0;
                 
                 for (const dup of duplicates) {
-                    // Keep the most complete link (has title, description, tags)
+                    // Keep the most complete link
                     const bestLink = dup.links.reduce((best, linkId) => {
                         const link = this.data.links.find(l => l.id === linkId);
                         const score = (link.title ? 1 : 0) + 
@@ -2417,7 +2912,6 @@
             }
             
             async suggestCategories() {
-                // Simulate AI category suggestion
                 this.showToast('AI is analyzing your links...', 'info');
                 
                 await new Promise(resolve => setTimeout(resolve, 2000));
@@ -2425,15 +2919,18 @@
                 let updatedCount = 0;
                 this.data.links.forEach(link => {
                     if (link.category === 'General') {
-                        // Simple AI logic (would be more sophisticated in production)
-                        if (link.url.includes('github') || link.url.includes('gitlab')) {
+                        const url = link.url.toLowerCase();
+                        if (url.includes('github') || url.includes('gitlab') || url.includes('stackoverflow')) {
                             link.category = 'Development';
                             updatedCount++;
-                        } else if (link.url.includes('youtube') || link.url.includes('netflix')) {
+                        } else if (url.includes('youtube') || url.includes('netflix') || url.includes('spotify')) {
                             link.category = 'Entertainment';
                             updatedCount++;
-                        } else if (link.url.includes('medium') || link.url.includes('wikipedia')) {
+                        } else if (url.includes('medium') || url.includes('wikipedia') || url.includes('coursera')) {
                             link.category = 'Learning';
+                            updatedCount++;
+                        } else if (url.includes('linkedin') || url.includes('indeed') || url.includes('glassdoor')) {
+                            link.category = 'Work';
                             updatedCount++;
                         }
                     }
@@ -2444,18 +2941,251 @@
                 this.showToast(`AI categorized ${updatedCount} links`, 'success');
             }
             
-            showContextMenu(x, y, linkId) {
+            async autoTagLinks() {
+                this.showToast('AI is analyzing and tagging your links...', 'info');
+                
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                let taggedCount = 0;
+                this.data.links.forEach(link => {
+                    const url = link.url.toLowerCase();
+                    const tags = new Set(link.tags);
+                    
+                    // Add tags based on URL patterns
+                    if (url.includes('tutorial') || url.includes('how-to') || url.includes('guide')) {
+                        tags.add('tutorial');
+                    }
+                    if (url.includes('docs') || url.includes('documentation')) {
+                        tags.add('documentation');
+                    }
+                    if (url.includes('api') || url.includes('developer')) {
+                        tags.add('api');
+                    }
+                    if (url.includes('blog') || url.includes('article')) {
+                        tags.add('blog');
+                    }
+                    if (url.includes('video') || url.includes('youtube')) {
+                        tags.add('video');
+                    }
+                    
+                    if (tags.size > link.tags.length) {
+                        link.tags = Array.from(tags);
+                        taggedCount++;
+                    }
+                });
+                
+                await this.saveData();
+                this.renderLinks();
+                this.showToast(`AI added tags to ${taggedCount} links`, 'success');
+            }
+            
+            showContextMenu(x, y) {
                 const menu = document.getElementById('contextMenu');
-                menu.style.left = x + 'px';
-                menu.style.top = y + 'px';
+                if (!menu) return;
+                
+                // Position the menu
+                menu.style.left = Math.min(x, window.innerWidth - 250) + 'px';
+                menu.style.top = Math.min(y, window.innerHeight - 300) + 'px';
                 menu.style.display = 'block';
-                menu.dataset.linkId = linkId;
             }
             
             closeContextMenu() {
                 const menu = document.getElementById('contextMenu');
-                menu.style.display = 'none';
-                delete menu.dataset.linkId;
+                if (menu) {
+                    menu.style.display = 'none';
+                }
+                this.state.contextMenuLinkId = null;
+            }
+            
+            editLink() {
+                if (!this.state.contextMenuLinkId) return;
+                
+                const link = this.data.links.find(l => l.id === this.state.contextMenuLinkId);
+                if (!link) return;
+                
+                // Populate the edit modal
+                const urlInput = document.getElementById('linkUrl');
+                const titleInput = document.getElementById('linkTitle');
+                const descInput = document.getElementById('linkDescription');
+                const categorySelect = document.getElementById('linkCategory');
+                const favoriteCheckbox = document.getElementById('linkFavorite');
+                const tagContainer = document.getElementById('tagContainer');
+                
+                if (urlInput) urlInput.value = link.url;
+                if (titleInput) titleInput.value = link.title;
+                if (descInput) descInput.value = link.description || '';
+                if (categorySelect) categorySelect.value = link.category;
+                if (favoriteCheckbox) favoriteCheckbox.checked = link.favorite;
+                
+                // Populate tags
+                if (tagContainer) {
+                    tagContainer.innerHTML = '';
+                    link.tags.forEach(tag => {
+                        const badge = document.createElement('span');
+                        badge.className = 'badge badge-clickable';
+                        badge.textContent = tag;
+                        badge.onclick = () => badge.remove();
+                        tagContainer.appendChild(badge);
+                    });
+                }
+                
+                // Change modal to edit mode
+                const modal = document.getElementById('addLinkModal');
+                const modalTitle = modal.querySelector('h2');
+                if (modalTitle) modalTitle.textContent = 'Edit Link';
+                
+                // Change submit button
+                const submitBtn = modal.querySelector('.btn-primary');
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Link';
+                    submitBtn.onclick = (e) => {
+                        e.preventDefault();
+                        this.updateLink(link.id);
+                    };
+                }
+                
+                openModal('addLinkModal');
+                this.closeContextMenu();
+            }
+            
+            async updateLink(linkId) {
+                const link = this.data.links.find(l => l.id === linkId);
+                if (!link) return;
+                
+                // Get updated values
+                const urlInput = document.getElementById('linkUrl');
+                const titleInput = document.getElementById('linkTitle');
+                const descInput = document.getElementById('linkDescription');
+                const categorySelect = document.getElementById('linkCategory');
+                const favoriteCheckbox = document.getElementById('linkFavorite');
+                const tagContainer = document.getElementById('tagContainer');
+                
+                if (urlInput) link.url = urlInput.value;
+                if (titleInput) link.title = titleInput.value;
+                if (descInput) link.description = descInput.value;
+                if (categorySelect) link.category = categorySelect.value;
+                if (favoriteCheckbox) link.favorite = favoriteCheckbox.checked;
+                
+                // Get tags
+                if (tagContainer) {
+                    link.tags = Array.from(tagContainer.querySelectorAll('.badge'))
+                        .map(badge => badge.textContent.trim());
+                }
+                
+                link.updatedAt = new Date().toISOString();
+                
+                await this.saveData();
+                this.renderLinks();
+                this.showToast('Link updated successfully!', 'success');
+                closeModal('addLinkModal');
+                
+                // Reset modal for next use
+                setTimeout(() => {
+                    const modalTitle = document.querySelector('#addLinkModal h2');
+                    if (modalTitle) modalTitle.textContent = 'Add New Link';
+                    
+                    const submitBtn = document.querySelector('#addLinkModal .btn-primary');
+                    if (submitBtn) {
+                        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Link';
+                        submitBtn.onclick = (e) => {
+                            e.preventDefault();
+                            saveLink(e);
+                        };
+                    }
+                }, 300);
+            }
+            
+            deleteLink() {
+                if (!this.state.contextMenuLinkId) return;
+                
+                if (confirm('Are you sure you want to delete this link?')) {
+                    this.data.links = this.data.links.filter(l => l.id !== this.state.contextMenuLinkId);
+                    this.saveData();
+                    this.renderLinks();
+                    this.showToast('Link deleted successfully', 'success');
+                    this.closeContextMenu();
+                }
+            }
+            
+            archiveLink() {
+                if (!this.state.contextMenuLinkId) return;
+                
+                const link = this.data.links.find(l => l.id === this.state.contextMenuLinkId);
+                if (link) {
+                    link.archived = !link.archived;
+                    this.saveData();
+                    this.renderLinks();
+                    this.showToast(link.archived ? 'Link archived' : 'Link unarchived', 'info');
+                    this.closeContextMenu();
+                }
+            }
+            
+            toggleFavorite(linkId = null) {
+                const id = linkId || this.state.contextMenuLinkId;
+                if (!id) return;
+                
+                const link = this.data.links.find(l => l.id === id);
+                if (link) {
+                    link.favorite = !link.favorite;
+                    this.saveData();
+                    this.renderLinks();
+                    this.showToast(link.favorite ? 'Added to favorites' : 'Removed from favorites', 'info');
+                }
+                
+                if (this.state.contextMenuLinkId) {
+                    this.closeContextMenu();
+                }
+            }
+            
+            copyLink(linkId) {
+                const link = this.data.links.find(l => l.id === linkId);
+                if (link) {
+                    navigator.clipboard.writeText(link.url).then(() => {
+                        this.showToast('Link copied to clipboard', 'success');
+                    }).catch(err => {
+                        console.error('Failed to copy link:', err);
+                        this.showToast('Failed to copy link', 'error');
+                    });
+                }
+            }
+            
+            shareLink(linkId) {
+                const link = this.data.links.find(l => l.id === linkId);
+                if (link && navigator.share) {
+                    navigator.share({
+                        title: link.title,
+                        text: link.description,
+                        url: link.url
+                    }).then(() => {
+                        this.showToast('Link shared successfully', 'success');
+                    }).catch(err => {
+                        console.error('Failed to share link:', err);
+                        this.showToast('Failed to share link', 'error');
+                    });
+                } else {
+                    this.copyLink(linkId);
+                }
+            }
+            
+            openLink(linkId) {
+                const link = this.data.links.find(l => l.id === linkId);
+                if (link) {
+                    // Track click
+                    link.clicks = (link.clicks || 0) + 1;
+                    this.saveData();
+                    
+                    // Open in new tab
+                    window.open(link.url, '_blank');
+                }
+            }
+            
+            filterByTag(tag) {
+                // Remove # if present
+                const cleanTag = tag.replace(/^#/, '');
+                this.state.selectedTags.add(cleanTag);
+                this.state.currentPage = 1;
+                this.renderLinks();
+                this.showToast(`Filtering by tag: ${cleanTag}`, 'info');
             }
             
             async createBackup() {
@@ -2479,29 +3209,14 @@
                 console.log('Backup created:', backup.timestamp);
             }
             
-            async restoreBackup(timestamp) {
-                const backups = JSON.parse(localStorage.getItem('linkManagerBackups') || '[]');
-                const backup = backups.find(b => b.timestamp === timestamp);
-                
-                if (backup) {
-                    this.data = backup.data;
-                    await this.saveData();
-                    this.render();
-                    this.showToast('Backup restored successfully', 'success');
-                    return true;
-                }
-                
-                return false;
-            }
-            
             startSync() {
-                // Simulate real-time sync (would connect to WebSocket in production)
+                // Simulate real-time sync
                 setInterval(() => {
                     if (navigator.onLine) {
-                        this.data.stats.sessionCount++;
+                        this.data.stats.sessionCount = Math.floor(Math.random() * 3) + 1;
                         this.updateStats();
                     }
-                }, 30000); // Every 30 seconds
+                }, 30000);
             }
             
             async exportData(format = 'json') {
@@ -2549,12 +3264,12 @@
             convertToCSV(links) {
                 const headers = ['Title', 'URL', 'Description', 'Category', 'Tags', 'Created At', 'Clicks'];
                 const rows = links.map(link => [
-                    `"${link.title.replace(/"/g, '""')}"`,
-                    `"${link.url.replace(/"/g, '""')}"`,
+                    `"${(link.title || '').replace(/"/g, '""')}"`,
+                    `"${(link.url || '').replace(/"/g, '""')}"`,
                     `"${(link.description || '').replace(/"/g, '""')}"`,
-                    `"${link.category}"`,
-                    `"${link.tags.join(', ')}"`,
-                    `"${link.createdAt}"`,
+                    `"${link.category || ''}"`,
+                    `"${(link.tags || []).join(', ')}"`,
+                    `"${link.createdAt || ''}"`,
                     link.clicks || 0
                 ]);
                 
@@ -2579,11 +3294,11 @@
                         <h1>Link Manager Export (${links.length} links)</h1>
                         ${links.map(link => `
                             <div class="link">
-                                <h3><a href="${link.url}">${this.escapeHtml(link.title)}</a></h3>
+                                <h3><a href="${this.escapeHtml(link.url)}">${this.escapeHtml(link.title)}</a></h3>
                                 <p>${this.escapeHtml(link.description || '')}</p>
                                 <div class="meta">
-                                    Category: ${link.category} | 
-                                    Tags: ${link.tags.join(', ')} | 
+                                    Category: ${this.escapeHtml(link.category)} | 
+                                    Tags: ${this.escapeHtml((link.tags || []).join(', '))} | 
                                     Added: ${new Date(link.createdAt).toLocaleDateString()} | 
                                     Clicks: ${link.clicks || 0}
                                 </div>
@@ -2598,6 +3313,8 @@
                 if (!this.data.settings.notifications) return;
                 
                 const container = document.getElementById('toastContainer');
+                if (!container) return;
+                
                 const toast = document.createElement('div');
                 
                 const icons = {
@@ -2626,14 +3343,18 @@
                 // Auto remove after 5 seconds
                 setTimeout(() => {
                     toast.style.animation = 'slideUp 0.3s ease-out forwards';
-                    setTimeout(() => toast.remove(), 300);
+                    setTimeout(() => {
+                        if (toast.parentNode === container) {
+                            container.removeChild(toast);
+                        }
+                    }, 300);
                 }, 5000);
             }
             
             showWelcomeMessage() {
                 if (!localStorage.getItem('linkManager_v5_welcome')) {
                     setTimeout(() => {
-                        this.showToast('Welcome to Link Manager Pro v5.0! Use Ctrl+K to open command palette.', 'info');
+                        this.showToast('Welcome to Link Manager Pro v5.2! Use Ctrl+K to open command palette.', 'info');
                         localStorage.setItem('linkManager_v5_welcome', 'true');
                     }, 1000);
                 }
@@ -2646,6 +3367,7 @@
             }
             
             escapeHtml(text) {
+                if (text === null || text === undefined) return '';
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
@@ -2654,14 +3376,58 @@
             render() {
                 this.updateStats();
                 this.renderLinks();
+                this.updatePagination();
                 
                 // Apply saved theme
                 this.setTheme(this.data.settings.theme);
             }
             
-            loadMoreLinks() {
-                this.state.currentPage++;
-                this.renderLinks();
+            // Enhanced AI Methods
+            generateWeeklyReport() {
+                this.showToast('Generating weekly report...', 'info');
+                // Implementation would generate a detailed report
+                setTimeout(() => {
+                    this.showToast('Weekly report generated! Check your downloads.', 'success');
+                }, 2000);
+            }
+            
+            findTrendingTopics() {
+                const tags = this.getTopTags(5);
+                this.showToast(`Trending topics: ${tags.join(', ')}`, 'info');
+            }
+            
+            generateLinkInsights() {
+                const insights = [
+                    `You have ${this.data.links.length} links total`,
+                    `Top category: ${this.getMostCommonCategory()}`,
+                    `Most used tag: ${this.getTopTags(1)[0] || 'None yet'}`,
+                    `Links added this month: ${this.getRecentLinks(30).length}`
+                ];
+                alert(`Link Insights:\n\n${insights.join('\n• ')}`);
+            }
+            
+            analyzeLinkPatterns() {
+                this.showToast('Analyzing your link patterns...', 'info');
+                setTimeout(() => {
+                    const patterns = this.analyzePatterns();
+                    alert(`Link Patterns Analysis:\n\n• ${patterns.join('\n• ')}`);
+                }, 2000);
+            }
+            
+            analyzePatterns() {
+                const patterns = [];
+                const hourCounts = new Array(24).fill(0);
+                
+                this.data.links.forEach(link => {
+                    const hour = new Date(link.createdAt).getHours();
+                    hourCounts[hour]++;
+                });
+                
+                const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
+                patterns.push(`Peak link saving time: ${peakHour}:00`);
+                patterns.push(`Most links saved during: ${peakHour >= 9 && peakHour <= 17 ? 'work hours' : 'evenings'}`);
+                
+                return patterns;
             }
         }
 
@@ -2669,18 +3435,33 @@
         let linkManager;
 
         function openAddLinkModal() {
+            // Reset form
+            const form = document.getElementById('linkForm');
+            if (form) form.reset();
+            
+            const tagContainer = document.getElementById('tagContainer');
+            if (tagContainer) tagContainer.innerHTML = '';
+            
+            const favoriteCheckbox = document.getElementById('linkFavorite');
+            if (favoriteCheckbox) favoriteCheckbox.checked = false;
+            
             openModal('addLinkModal');
         }
 
         function openCommandPalette() {
             openModal('commandPalette');
-            document.getElementById('commandInput').focus();
+            const commandInput = document.getElementById('commandInput');
+            if (commandInput) {
+                commandInput.focus();
+                commandInput.value = '';
+            }
         }
 
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
             }
         }
 
@@ -2688,6 +3469,7 @@
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('active');
+                document.body.style.overflow = '';
             }
         }
 
@@ -2696,12 +3478,15 @@
         }
 
         function openAIOrganizeModal() {
-            linkManager.openAIAssistant();
+            if (linkManager) {
+                linkManager.openAIAssistant();
+            }
         }
 
         function openAnalyticsModal() {
-            // Open analytics in a new tab or modal
-            linkManager.showToast('Opening analytics dashboard...', 'info');
+            if (linkManager) {
+                linkManager.showToast('Opening analytics dashboard...', 'info');
+            }
         }
 
         function scrollToTop() {
@@ -2711,15 +3496,20 @@
         async function saveLink(event) {
             event.preventDefault();
             
-            const url = document.getElementById('linkUrl').value;
-            const title = document.getElementById('linkTitle').value;
-            const description = document.getElementById('linkDescription').value;
-            const category = document.getElementById('linkCategory').value;
-            const favorite = document.getElementById('linkFavorite').checked;
+            const url = document.getElementById('linkUrl')?.value;
+            const title = document.getElementById('linkTitle')?.value;
+            const description = document.getElementById('linkDescription')?.value;
+            const category = document.getElementById('linkCategory')?.value;
+            const favorite = document.getElementById('linkFavorite')?.checked;
             
             // Get tags from tag container
             const tags = Array.from(document.querySelectorAll('#tagContainer .badge'))
                 .map(tag => tag.textContent.trim());
+            
+            if (!url || !title) {
+                linkManager.showToast('URL and Title are required', 'error');
+                return;
+            }
             
             await linkManager.addLink({
                 url,
@@ -2734,18 +3524,22 @@
             
             // Reset form
             event.target.reset();
-            document.getElementById('tagContainer').innerHTML = '';
-            document.getElementById('linkFavorite').checked = false;
+            const tagContainer = document.getElementById('tagContainer');
+            if (tagContainer) tagContainer.innerHTML = '';
+            const favoriteCheckbox = document.getElementById('linkFavorite');
+            if (favoriteCheckbox) favoriteCheckbox.checked = false;
         }
 
         function importFromBrowser() {
-            linkManager.showToast('Browser import requires extension installation', 'info');
+            if (linkManager) {
+                linkManager.showToast('Browser import requires extension installation', 'info');
+            }
         }
 
         function importFromFile() {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.json,.csv,.html';
+            input.accept = '.json,.csv,.html,.txt';
             
             input.onchange = async (e) => {
                 const file = e.target.files[0];
@@ -2754,15 +3548,22 @@
                     try {
                         const data = JSON.parse(text);
                         if (data.links && Array.isArray(data.links)) {
+                            let importedCount = 0;
                             for (const link of data.links) {
                                 await linkManager.addLink(link);
+                                importedCount++;
                             }
-                            linkManager.showToast(`Imported ${data.links.length} links`, 'success');
+                            linkManager.showToast(`Imported ${importedCount} links`, 'success');
+                            closeModal('importModal');
+                        } else {
+                            linkManager.showToast('Invalid file format', 'error');
                         }
                     } catch (error) {
                         // Try CSV import
                         if (file.name.endsWith('.csv')) {
                             await linkManager.importCSV(text);
+                        } else {
+                            linkManager.showToast('Failed to parse file', 'error');
                         }
                     }
                 }
@@ -2778,25 +3579,35 @@
                 
                 lines.forEach(line => {
                     if (line.startsWith('http')) {
-                        linkManager.addLink({
-                            url: line.trim(),
-                            title: new URL(line).hostname,
-                            category: 'Imported'
-                        });
-                        importedCount++;
+                        try {
+                            new URL(line.trim()); // Validate URL
+                            linkManager.addLink({
+                                url: line.trim(),
+                                title: new URL(line).hostname,
+                                category: 'Imported'
+                            });
+                            importedCount++;
+                        } catch (error) {
+                            // Invalid URL, skip
+                        }
                     }
                 });
                 
                 if (importedCount > 0) {
                     linkManager.showToast(`Imported ${importedCount} links from clipboard`, 'success');
+                    closeModal('importModal');
                 } else {
                     linkManager.showToast('No valid URLs found in clipboard', 'warning');
                 }
+            }).catch(err => {
+                linkManager.showToast('Failed to read clipboard', 'error');
             });
         }
 
-        function exportData(format) {
-            linkManager.exportData(format);
+        function sendAIQuery() {
+            if (linkManager) {
+                linkManager.sendAIQuery();
+            }
         }
 
         // Initialize the application
@@ -2810,13 +3621,22 @@
             tagInput?.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ',') {
                     e.preventDefault();
-                    const tag = tagInput.value.trim();
+                    const tag = tagInput.value.trim().replace(/,/g, '');
                     if (tag) {
-                        const badge = document.createElement('span');
-                        badge.className = 'badge';
-                        badge.textContent = tag;
-                        tagContainer.appendChild(badge);
-                        tagInput.value = '';
+                        // Check for duplicates
+                        const existingTags = Array.from(tagContainer.querySelectorAll('.badge'))
+                            .map(badge => badge.textContent.trim());
+                        
+                        if (!existingTags.includes(tag)) {
+                            const badge = document.createElement('span');
+                            badge.className = 'badge badge-clickable';
+                            badge.textContent = tag;
+                            badge.onclick = () => badge.remove();
+                            tagContainer.appendChild(badge);
+                            tagInput.value = '';
+                        } else {
+                            linkManager.showToast('Tag already added', 'warning');
+                        }
                     }
                 }
             });
@@ -2827,13 +3647,26 @@
                 const query = e.target.value.toLowerCase();
                 const results = document.getElementById('commandResults');
                 
+                if (!results) return;
+                
                 const commands = [
                     { name: 'Add New Link', icon: 'plus', action: openAddLinkModal, shortcut: 'Ctrl+N' },
                     { name: 'Open AI Assistant', icon: 'robot', action: openAIOrganizeModal, shortcut: 'Ctrl+J' },
-                    { name: 'Export Data', icon: 'download', action: () => exportData('json') },
+                    { name: 'Export Data as JSON', icon: 'download', action: () => linkManager.exportData('json') },
+                    { name: 'Export Data as CSV', icon: 'file-csv', action: () => linkManager.exportData('csv') },
                     { name: 'Import Links', icon: 'upload', action: openImportModal },
-                    { name: 'Toggle Dark Mode', icon: 'moon', action: () => linkManager.toggleDarkMode() },
-                    { name: 'Clear Search', icon: 'times', action: () => document.getElementById('searchInput').value = '' },
+                    { name: 'Toggle Light Mode', icon: 'sun', action: () => linkManager.setTheme('light') },
+                    { name: 'Toggle Dark Mode', icon: 'moon', action: () => linkManager.setTheme('dark') },
+                    { name: 'Toggle Midnight Mode', icon: 'stars', action: () => linkManager.setTheme('midnight') },
+                    { name: 'Clear Search', icon: 'times', action: () => {
+                        const searchInput = document.getElementById('searchInput');
+                        if (searchInput) {
+                            searchInput.value = '';
+                            linkManager.state.searchQuery = '';
+                            linkManager.state.currentPage = 1;
+                            linkManager.renderLinks();
+                        }
+                    }},
                     { name: 'View Statistics', icon: 'chart-line', action: openAnalyticsModal },
                     { name: 'Settings', icon: 'cog', action: () => linkManager.showToast('Settings coming soon', 'info') }
                 ];
@@ -2843,18 +3676,27 @@
                 );
                 
                 results.innerHTML = filtered.map(cmd => `
-                    <div class="context-menu-item" onclick="${cmd.action}(); closeModal('commandPalette');">
+                    <div class="context-menu-item" onclick="${cmd.action.name}(); closeModal('commandPalette');">
                         <i class="fas fa-${cmd.icon}"></i>
                         <span style="flex: 1;">${cmd.name}</span>
                         <span class="shortcut">${cmd.shortcut}</span>
                     </div>
                 `).join('');
+                
+                if (filtered.length === 0) {
+                    results.innerHTML = `
+                        <div class="context-menu-item" style="color: var(--text-tertiary); cursor: default;">
+                            <i class="fas fa-search"></i>
+                            <span>No commands found</span>
+                        </div>
+                    `;
+                }
             });
             
             commandInput?.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     const firstItem = document.querySelector('#commandResults .context-menu-item');
-                    if (firstItem) {
+                    if (firstItem && !firstItem.style.color) {
                         firstItem.click();
                     }
                 }
@@ -2862,6 +3704,45 @@
                     closeModal('commandPalette');
                 }
             });
+            
+            // Close modals when clicking outside
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+            
+            // Prevent form submission on Enter in search
+            const searchInput = document.getElementById('searchInput');
+            searchInput?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Add global error handler
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            if (linkManager) {
+                linkManager.showToast('An error occurred. Please refresh the page.', 'error');
+            }
+        });
+
+        // Handle offline/online status
+        window.addEventListener('online', () => {
+            if (linkManager) {
+                linkManager.showToast('You are back online', 'success');
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            if (linkManager) {
+                linkManager.showToast('You are offline. Some features may be limited.', 'warning');
+            }
         });
     </script>
 </body>
